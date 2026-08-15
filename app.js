@@ -36,16 +36,54 @@ function fillWorkerSelects(){
 function uid(){return crypto.randomUUID?crypto.randomUUID():Date.now()+"-"+Math.random()}
 
 $("loginBtn").onclick=()=>{
-  // The first version is local-only. Credentials are configured in this browser.
-  const email=$("email").value.trim(), pass=$("password").value;
+  const email=$("email").value.trim();
+  const pass=$("password").value;
   const saved=localStorage.getItem("rozana_login");
-  if(!saved){
-    if(email && pass.length>=6){localStorage.setItem("rozana_login",JSON.stringify({email,pass})); showApp();}
-    else $("loginError").textContent="أدخل البريد وكلمة مرور من 6 أحرف على الأقل لإنشاء الدخول الأول.";
-  }else{
-    const c=JSON.parse(saved);
-    if(email===c.email && pass===c.pass) showApp(); else $("loginError").textContent="البريد الإلكتروني أو كلمة المرور غير صحيحة.";
+
+  if(!email || pass.length<6){
+    $("loginError").textContent="أدخل البريد الإلكتروني وكلمة مرور من 6 أحرف على الأقل.";
+    return;
   }
+
+  if(!saved){
+    localStorage.setItem(
+      "rozana_login",
+      JSON.stringify({email,pass})
+    );
+    showApp();
+    return;
+  }
+
+  try{
+    const c=JSON.parse(saved);
+
+    if(email===c.email && pass===c.pass){
+      showApp();
+    }else{
+      $("loginError").textContent="البريد الإلكتروني أو كلمة المرور غير صحيحة.";
+    }
+  }catch(e){
+    localStorage.removeItem("rozana_login");
+    $("loginError").textContent="تمت إعادة ضبط بيانات الدخول. أدخل البيانات مرة أخرى.";
+  }
+};
+
+const resetLoginBtn=document.createElement("button");
+resetLoginBtn.type="button";
+resetLoginBtn.textContent="إعادة ضبط بيانات الدخول";
+resetLoginBtn.style.cssText=
+  "margin-top:14px;background:transparent;border:0;color:#16805c;font-size:14px;cursor:pointer;width:100%;";
+
+resetLoginBtn.onclick=()=>{
+  if(confirm("هل تريد إعادة ضبط بيانات الدخول لهذا الجهاز؟")){
+    localStorage.removeItem("rozana_login");
+    $("email").value="";
+    $("password").value="";
+    $("loginError").textContent="تمت إعادة ضبط بيانات الدخول. أدخل بريدك وكلمة المرور الجديدة.";
+  }
+};
+
+$("loginBtn").parentElement.appendChild(resetLoginBtn);
 };
 function showApp(){$("loginView").classList.add("hidden");$("appView").classList.remove("hidden");renderAll()}
 $("logoutBtn").onclick=()=>{$("appView").classList.add("hidden");$("loginView").classList.remove("hidden");$("password").value=""}
