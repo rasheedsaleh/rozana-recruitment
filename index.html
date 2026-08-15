@@ -1,163 +1,209 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>روزنا الأردنية — إدارة الاستقدام</title>
-  <link rel="stylesheet" href="styles.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>روزنا الأردنية — نظام إدارة الاستقدام</title>
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div id="loginView" class="login-wrap">
-    <div class="login-card">
-      <div class="logo">روزنا</div>
-      <h1>نظام إدارة الاستقدام</h1>
-      <p>روزنا الأردنية لاستخدام العاملين في المنازل</p>
-      <label>البريد الإلكتروني</label>
-      <input id="email" type="email" autocomplete="username" placeholder="البريد الإلكتروني">
-      <label>كلمة المرور</label>
-      <input id="password" type="password" autocomplete="current-password" placeholder="كلمة المرور">
-      <button id="loginBtn" class="primary">دخول</button>
-      <div id="loginError" class="error"></div>
+<div id="loginView" class="login-wrap">
+  <div class="login-card">
+    <div class="logo">روزنا</div>
+    <h1>نظام إدارة الاستقدام</h1>
+    <p>روزنا الأردنية لاستخدام العاملين في المنازل</p>
+    <label>البريد الإلكتروني</label>
+    <input id="email" type="email" autocomplete="username" placeholder="البريد الإلكتروني">
+    <label>كلمة المرور</label>
+    <input id="password" type="password" autocomplete="current-password" placeholder="كلمة المرور">
+    <button id="loginBtn" class="primary full">دخول</button>
+    <div id="loginError" class="error"></div>
+  </div>
+</div>
+
+<div id="appView" class="hidden">
+<header class="topbar">
+  <div class="brand"><strong id="brandName">روزنا</strong><span>نظام إدارة شركات الاستقدام — <b id="headerManagerName">المدير</b></span></div>
+  <button id="logoutBtn" class="ghost">تسجيل الخروج</button>
+</header>
+
+<main class="container">
+  <section class="dashboard">
+    <div class="stat"><b id="workersCount">0</b><span>العاملات</span></div>
+    <div class="stat"><b id="activeCount">0</b><span>نشاطات جارية</span></div>
+    <div class="stat"><b id="paymentsTotal">0.00 د.أ</b><span>إجمالي الدفعات</span></div>
+    <div class="stat"><b id="expensesTotal">0.00 د.أ</b><span>إجمالي المصاريف</span></div>
+  </section>
+
+  <nav class="tabs" id="tabs">
+    <button class="tab active" data-tab="workers">العاملات</button>
+    <button class="tab" data-tab="guarantors">الكفلاء</button>
+    <button class="tab" data-tab="payments">الدفعات</button>
+    <button class="tab" data-tab="expenses">المصاريف</button>
+    <button class="tab" data-tab="followup">المتابعة</button>
+    <button class="tab" data-tab="reports">التقارير</button>
+    <button class="tab" data-tab="settings">الإعدادات</button>
+  </nav>
+
+  <section id="workers" class="panel active">
+    <div class="panel-head"><div><h2>ملفات العاملات</h2><p>إضافة وتعديل والبحث في ملفات العاملات.</p></div><button id="addWorker" class="primary">+ إضافة عاملة</button></div>
+    <div class="filters">
+      <input id="workerSearch" placeholder="بحث بالاسم أو الجواز أو الهاتف">
+      <select id="workerStatus"><option value="">كل الحالات</option><option>متاحة</option><option>محجوزة</option><option>وصلت</option><option>غادرت</option></select>
+      <select id="workerNationality"><option value="">كل الجنسيات</option><option>إثيوبيا</option><option>غانا</option><option>بوروندي</option><option>الفلبين</option><option>بنغلادش</option><option>نيبال</option><option>أوغندا</option><option>أخرى</option></select>
     </div>
-  </div>
+    <div class="table-wrap"><table><thead><tr><th>الاسم</th><th>جنسية العاملة</th><th>الجواز</th><th>الكفيل</th><th>الحالة</th><th>تاريخ الإضافة</th><th></th></tr></thead><tbody id="workersTable"></tbody></table></div>
+  </section>
 
-  <div id="appView" class="hidden">
-    <header class="topbar">
-      <div>
-        <strong>روزنا</strong>
-        <span>نظام إدارة شركات الاستقدام — <b id="headerManagerName">المدير</b></span>
+  <section id="guarantors" class="panel">
+    <div class="panel-head"><div><h2>الكفلاء</h2><p>إدارة بيانات الكفلاء وربطهم بالعاملات.</p></div><button id="addGuarantor" class="primary">+ إضافة كفيل</button></div>
+    <div class="filters"><input id="guarantorSearch" placeholder="بحث باسم الكفيل أو الهاتف"><select id="guarantorNationalityFilter"><option value="">كل الجنسيات</option><option>أردني</option><option>فلسطيني</option><option>سوري</option><option>عراقي</option><option>سعودي</option><option>كويتي</option><option>إماراتي</option><option>قطري</option><option>مصري</option><option>لبناني</option><option>أخرى</option></select></div>
+    <div class="table-wrap"><table><thead><tr><th>اسم الكفيل</th><th>الجنسية</th><th>الهاتف</th><th>عدد العاملات</th><th></th></tr></thead><tbody id="guarantorsTable"></tbody></table></div>
+  </section>
+
+  <section id="payments" class="panel">
+    <div class="panel-head"><div><h2>الدفعات</h2><p>تسجيل الدفعات ومتابعة المبالغ.</p></div><button id="addPayment" class="primary">+ دفعة جديدة</button></div>
+    <div class="table-wrap"><table><thead><tr><th>العاملة</th><th>المبلغ</th><th>الطريقة</th><th>التاريخ</th><th>ملاحظات</th><th></th></tr></thead><tbody id="paymentsTable"></tbody></table></div>
+  </section>
+
+  <section id="expenses" class="panel">
+    <div class="panel-head"><div><h2>المصاريف</h2><p>تسجيل المصاريف ومتابعة إجمالي التكاليف.</p></div><button id="addExpense" class="primary">+ إضافة مصروف</button></div>
+    <div class="summary-row"><div>إجمالي المصاريف <b id="expensesPanelTotal">0.00 د.أ</b></div></div>
+    <div class="table-wrap"><table><thead><tr><th>البيان</th><th>المبلغ</th><th>التاريخ</th><th>ملاحظات</th><th></th></tr></thead><tbody id="expensesTable"></tbody></table></div>
+  </section>
+
+  <section id="followup" class="panel">
+    <div class="panel-head"><div><h2>المتابعة</h2><p>متابعة الحالات والمواعيد والملاحظات الخاصة بالعاملات.</p></div><button id="addFollowup" class="primary">+ إضافة متابعة</button></div>
+    <div class="table-wrap"><table><thead><tr><th>العاملة</th><th>التاريخ</th><th>نوع المتابعة</th><th>الحالة</th><th>الملاحظات</th><th></th></tr></thead><tbody id="followupTable"></tbody></table></div>
+  </section>
+
+  <section id="reports" class="panel">
+    <div class="panel-head"><div><h2>التقارير والحسابات</h2><p>تقارير العاملات والدفعات والمصاريف والمتابعة.</p></div></div>
+    <div class="report-grid">
+      <button class="report-card" data-report="workers">تقرير العاملات</button>
+      <button class="report-card" data-report="payments">تقرير الدفعات</button>
+      <button class="report-card" data-report="expenses">تقرير المصاريف</button>
+      <button class="report-card" data-report="all">تقرير شامل</button>
+    </div>
+    <div class="finance-box">
+      <div><span>إجمالي الدفعات</span><b id="reportPayments">0.00 د.أ</b></div>
+      <div><span>إجمالي المصاريف</span><b id="reportExpenses">0.00 د.أ</b></div>
+      <div><span>الفرق</span><b id="reportBalance">0.00 د.أ</b></div>
+    </div>
+    <div class="hint">من الآيفون يمكن اختيار «طباعة / حفظ PDF» من صفحة التقرير.</div>
+  </section>
+
+  <section id="settings" class="panel">
+    <h2>الإعدادات</h2>
+
+    <div class="settings-card">
+      <h3>بيانات الشركة</h3>
+      <label>اسم الشركة</label><input id="companyName">
+      <label>الهاتف</label><input id="companyPhone" placeholder="رقم الهاتف">
+      <button id="saveSettings" class="primary">حفظ</button>
+    </div>
+
+    <div class="settings-card">
+      <h3>المدير والمستخدمون</h3>
+      <label>اسم المدير</label><input id="managerName">
+      <label>البريد الإلكتروني للمدير</label><input id="managerEmail" type="email">
+      <button id="saveManager" class="primary">حفظ بيانات المدير</button>
+      <hr>
+      <h4>إضافة موظف</h4>
+      <label>اسم الموظف</label><input id="newUserName" placeholder="اسم الموظف">
+      <label>البريد الإلكتروني</label><input id="newUserEmail" type="email">
+      <label>كلمة المرور</label><input id="newUserPassword" type="password" minlength="6">
+      <label>الدور</label>
+      <select id="newUserRole"><option value="employee">موظف</option><option value="accounting">حسابات</option><option value="viewer">مشاهد</option></select>
+      <div class="permissions-grid">
+        <label><input type="checkbox" class="perm" value="workers" checked> العاملات</label>
+        <label><input type="checkbox" class="perm" value="guarantors" checked> الكفلاء</label>
+        <label><input type="checkbox" class="perm" value="payments" checked> الدفعات</label>
+        <label><input type="checkbox" class="perm" value="expenses" checked> المصاريف</label>
+        <label><input type="checkbox" class="perm" value="followup" checked> المتابعة</label>
+        <label><input type="checkbox" class="perm" value="reports" checked> التقارير</label>
+        <label><input type="checkbox" class="perm" value="settings"> الإعدادات</label>
       </div>
-      <button id="logoutBtn" class="ghost">تسجيل الخروج</button>
-    </header>
+      <button id="addUser" class="secondary">+ إضافة موظف</button>
+      <div class="table-wrap"><table><thead><tr><th>الاسم</th><th>البريد</th><th>الدور</th><th>الصلاحيات</th><th></th></tr></thead><tbody id="usersTable"></tbody></table></div>
+    </div>
 
-    <main class="container">
-      <section class="dashboard">
-        <div class="stat"><b id="workersCount">0</b><span>العاملات</span></div>
-        <div class="stat"><b id="activeCount">0</b><span>نشاطات جارية</span></div>
-        <div class="stat"><b id="paymentsTotal">0</b><span>إجمالي الدفعات</span></div>
-      </section>
+    <div class="settings-card">
+      <h3>تغيير كلمة مرور المدير</h3>
+      <label>كلمة المرور الحالية</label><input id="currentPassword" type="password">
+      <label>كلمة المرور الجديدة</label><input id="newPassword" type="password" minlength="6">
+      <label>تأكيد كلمة المرور</label><input id="confirmPassword" type="password" minlength="6">
+      <button id="changePassword" class="primary">تغيير كلمة المرور</button>
+    </div>
 
-      <nav class="tabs">
-        <button class="tab active" data-tab="workers">العاملات</button>
-        <button class="tab" data-tab="payments">الدفعات</button>
-        <button class="tab" data-tab="reports">التقارير</button>
-        <button class="tab" data-tab="settings">الإعدادات</button>
-      </nav>
+    <div class="settings-card">
+      <h3>مظهر النظام</h3>
+      <label>اللون الرئيسي</label><input id="themeColor" type="color">
+      <button id="saveTheme" class="primary">حفظ اللون</button>
+    </div>
 
-      <section id="workers" class="panel active">
-        <div class="panel-head">
-          <div><h2>ملفات العاملات</h2><p>إضافة وتعديل والبحث في ملفات العاملات.</p></div>
-          <button id="addWorker" class="primary">+ إضافة عاملة</button>
-        </div>
-        <div class="filters">
-          <input id="workerSearch" placeholder="بحث بالاسم أو الجواز أو الهاتف">
-          <select id="workerStatus"><option value="">كل الحالات</option><option>متاحة</option><option>محجوزة</option><option>وصلت</option><option>غادرت</option></select>
-          <select id="workerNationality"><option value="">كل الجنسيات</option><option>إثيوبيا</option><option>غانا</option><option>بروندي</option><option>الفلبين</option><option>بنغلادش</option><option>نيبال</option><option>أوغندا</option><option>أخرى</option></select>
-        </div>
-        <div class="table-wrap">
-          <table><thead><tr><th>الاسم</th><th>جنسية العاملة</th><th>الجواز</th><th>الحالة</th><th>تاريخ الإضافة</th><th></th></tr></thead>
-          <tbody id="workersTable"></tbody></table>
-        </div>
-      </section>
+    <div class="settings-card">
+      <h3>تنبيه Telegram</h3>
+      <div class="hint">عند تسجيل الدخول يرسل النظام تنبيهًا إلى Telegram عبر Cloudflare. لا يتم وضع Bot Token داخل ملفات GitHub أو داخل المتصفح.</div>
+      <div class="badge">بدون ربط برقم الهاتف</div>
+    </div>
 
-      <section id="payments" class="panel">
-        <div class="panel-head"><div><h2>الدفعات</h2><p>تسجيل الدفعات ومتابعة المبالغ.</p></div><button id="addPayment" class="primary">+ دفعة جديدة</button></div>
-        <div class="table-wrap"><table><thead><tr><th>العاملة</th><th>المبلغ</th><th>الطريقة</th><th>التاريخ</th><th>ملاحظات</th><th></th></tr></thead><tbody id="paymentsTable"></tbody></table></div>
-      </section>
+    <div class="settings-card">
+      <h3>البيانات</h3>
+      <button id="exportData" class="secondary">تصدير نسخة احتياطية</button>
+      <label class="file-btn">استيراد نسخة احتياطية<input id="importData" type="file" accept=".json" hidden></label>
+    </div>
+  </section>
+</main>
+</div>
 
-      <section id="reports" class="panel">
-        <div class="panel-head"><div><h2>التقارير</h2><p>طباعة تقرير PDF من بيانات النظام.</p></div></div>
-        <div class="report-grid">
-          <button class="report-card" data-report="workers">تقرير العاملات</button>
-          <button class="report-card" data-report="payments">تقرير الدفعات</button>
-          <button class="report-card" data-report="all">تقرير شامل</button>
-        </div>
-        <div class="hint">عند الضغط على التقرير ستفتح صفحة الطباعة، ومن الآيفون يمكنك اختيار «حفظ كـ PDF».</div>
-      </section>
+<dialog id="workerDialog"><form method="dialog" id="workerForm">
+<h2 id="workerDialogTitle">إضافة عاملة</h2><input type="hidden" id="workerId">
+<label>الاسم الكامل</label><input id="wName" required>
+<label>جنسية العاملة</label><select id="wNationality"><option>إثيوبيا</option><option>غانا</option><option>بوروندي</option><option>الفلبين</option><option>بنغلادش</option><option>نيبال</option><option>أوغندا</option><option>أخرى</option></select>
+<label>رقم الجواز</label><input id="wPassport">
+<label>اسم الكفيل</label><input id="wGuarantorName">
+<label>جنسية الكفيل</label><select id="wGuarantorNationality"><option>أردني</option><option>فلسطيني</option><option>سوري</option><option>عراقي</option><option>سعودي</option><option>كويتي</option><option>إماراتي</option><option>قطري</option><option>مصري</option><option>لبناني</option><option>أخرى</option></select>
+<label>هاتف العاملة</label><input id="wPhone">
+<label>الحالة</label><select id="wStatus"><option>متاحة</option><option>محجوزة</option><option>وصلت</option><option>غادرت</option></select>
+<label>تاريخ الميلاد</label><input id="wDob" type="date">
+<label>ملاحظات</label><textarea id="wNotes"></textarea>
+<div class="dialog-actions"><button value="cancel" class="secondary">إلغاء</button><button id="saveWorker" class="primary" value="default">حفظ</button></div>
+</form></dialog>
 
-      <section id="settings" class="panel">
-        <h2>الإعدادات</h2>
-        <div class="settings-card">
-          <h3>بيانات الشركة</h3>
-          <label>اسم الشركة</label><input id="companyName" value="روزنا الأردنية لاستخدام العاملين في المنازل">
-          <label>الهاتف</label><input id="companyPhone" placeholder="رقم الهاتف">
-          <button id="saveSettings" class="primary">حفظ</button>
-        </div>
-        <div class="settings-card">
-          <h3>المدير والمستخدمون</h3>
-          <label>اسم المدير</label><input id="managerName" placeholder="اسم المدير">
-          <label>البريد الإلكتروني للمدير</label><input id="managerEmail" type="email">
-          <button id="saveManager" class="primary">حفظ بيانات المدير</button>
-          <hr>
-          <h4>إضافة موظف</h4>
-          <label>اسم الموظف</label><input id="newUserName" placeholder="اسم الموظف">
-          <label>البريد الإلكتروني</label><input id="newUserEmail" type="email" placeholder="البريد الإلكتروني">
-          <label>كلمة المرور</label><input id="newUserPassword" type="password" minlength="6" placeholder="6 أحرف أو أكثر">
-          <label>الدور</label>
-          <select id="newUserRole"><option value="employee">موظف</option><option value="accounting">حسابات</option><option value="viewer">مشاهد</option></select>
-          <div class="permissions-grid">
-            <label><input type="checkbox" class="perm" value="workers" checked> العاملات</label>
-            <label><input type="checkbox" class="perm" value="payments" checked> الدفعات</label>
-            <label><input type="checkbox" class="perm" value="reports" checked> التقارير</label>
-            <label><input type="checkbox" class="perm" value="settings"> الإعدادات</label>
-          </div>
-          <button id="addUser" class="secondary">+ إضافة موظف</button>
-          <div class="table-wrap"><table><thead><tr><th>الاسم</th><th>البريد</th><th>الدور</th><th>الصلاحيات</th><th></th></tr></thead><tbody id="usersTable"></tbody></table></div>
-        </div>
+<dialog id="guarantorDialog"><form method="dialog" id="guarantorForm">
+<h2>إضافة كفيل</h2><input type="hidden" id="gId">
+<label>اسم الكفيل</label><input id="gName" required>
+<label>الجنسية</label><select id="gNationality"><option>أردني</option><option>فلسطيني</option><option>سوري</option><option>عراقي</option><option>سعودي</option><option>كويتي</option><option>إماراتي</option><option>قطري</option><option>مصري</option><option>لبناني</option><option>أخرى</option></select>
+<label>الهاتف</label><input id="gPhone">
+<label>ملاحظات</label><textarea id="gNotes"></textarea>
+<div class="dialog-actions"><button value="cancel" class="secondary">إلغاء</button><button class="primary" value="default">حفظ</button></div>
+</form></dialog>
 
-        <div class="settings-card">
-          <h3>تغيير كلمة المرور</h3>
-          <label>كلمة المرور الحالية</label><input id="currentPassword" type="password">
-          <label>كلمة المرور الجديدة</label><input id="newPassword" type="password" minlength="6">
-          <label>تأكيد كلمة المرور</label><input id="confirmPassword" type="password" minlength="6">
-          <button id="changePassword" class="primary">تغيير كلمة المرور</button>
-        </div>
+<dialog id="paymentDialog"><form method="dialog" id="paymentForm">
+<h2>إضافة دفعة</h2><label>العاملة</label><select id="pWorker" required></select>
+<label>المبلغ (دينار)</label><input id="pAmount" type="number" step="0.01" required>
+<label>طريقة الدفع</label><select id="pMethod"><option>نقدي</option><option>تحويل بنكي</option><option>كليك</option><option>أخرى</option></select>
+<label>التاريخ</label><input id="pDate" type="date" required><label>ملاحظات</label><input id="pNotes">
+<div class="dialog-actions"><button value="cancel" class="secondary">إلغاء</button><button class="primary" value="default">حفظ</button></div>
+</form></dialog>
 
-        <div class="settings-card">
-          <h3>مظهر النظام</h3>
-          <label>اللون الرئيسي</label>
-          <input id="themeColor" type="color" value="#16805c">
-          <button id="saveTheme" class="primary">حفظ اللون</button>
-        </div>
+<dialog id="expenseDialog"><form method="dialog" id="expenseForm">
+<h2>إضافة مصروف</h2><label>البيان</label><input id="eTitle" required>
+<label>المبلغ (دينار)</label><input id="eAmount" type="number" step="0.01" required>
+<label>التاريخ</label><input id="eDate" type="date" required><label>ملاحظات</label><input id="eNotes">
+<div class="dialog-actions"><button value="cancel" class="secondary">إلغاء</button><button class="primary" value="default">حفظ</button></div>
+</form></dialog>
 
-        <div class="settings-card">
-          <h3>البيانات</h3>
-          <button id="exportData" class="secondary">تصدير نسخة احتياطية</button>
-          <label class="file-btn">استيراد نسخة احتياطية<input id="importData" type="file" accept=".json" hidden></label>
-        </div>
-      </section>
-    </main>
-  </div>
+<dialog id="followupDialog"><form method="dialog" id="followupForm">
+<h2>إضافة متابعة</h2><label>العاملة</label><select id="fWorker" required></select>
+<label>التاريخ</label><input id="fDate" type="date" required>
+<label>نوع المتابعة</label><select id="fType"><option>اتصال</option><option>زيارة</option><option>حالة</option><option>مستندات</option><option>أخرى</option></select>
+<label>الحالة</label><select id="fStatus"><option>جديدة</option><option>قيد المتابعة</option><option>مكتملة</option></select>
+<label>الملاحظات</label><textarea id="fNotes"></textarea>
+<div class="dialog-actions"><button value="cancel" class="secondary">إلغاء</button><button class="primary" value="default">حفظ</button></div>
+</form></dialog>
 
-  <dialog id="workerDialog">
-    <form method="dialog" id="workerForm">
-      <h2 id="workerDialogTitle">إضافة عاملة</h2>
-      <input type="hidden" id="workerId">
-      <label>الاسم الكامل</label><input id="wName" required>
-      <label>جنسية العاملة</label><select id="wNationality"><option>إثيوبيا</option><option>غانا</option><option>بروندي</option><option>الفلبين</option><option>بنغلادش</option><option>نيبال</option><option>أوغندا</option><option>أخرى</option></select>
-      <label>رقم الجواز</label><input id="wPassport">
-      <label>اسم الكفيل</label><input id="wGuarantorName">
-      <label>جنسية الكفيل</label><select id="wGuarantorNationality"><option>أردني</option><option>فلسطيني</option><option>سوري</option><option>عراقي</option><option>سعودي</option><option>كويتي</option><option>إماراتي</option><option>قطري</option><option>مصري</option><option>لبناني</option><option>أخرى</option></select>
-      <label>هاتف العاملة</label><input id="wPhone">
-      <label>الحالة</label><select id="wStatus"><option>متاحة</option><option>محجوزة</option><option>وصلت</option><option>غادرت</option></select>
-      <label>تاريخ الميلاد</label><input id="wDob" type="date">
-      <label>ملاحظات</label><textarea id="wNotes"></textarea>
-      <div class="dialog-actions"><button value="cancel" class="secondary">إلغاء</button><button id="saveWorker" class="primary" value="default">حفظ</button></div>
-    </form>
-  </dialog>
-
-  <dialog id="paymentDialog">
-    <form method="dialog" id="paymentForm">
-      <h2>إضافة دفعة</h2>
-      <label>العاملة</label><select id="pWorker" required></select>
-      <label>المبلغ (دينار)</label><input id="pAmount" type="number" step="0.01" required>
-      <label>طريقة الدفع</label><select id="pMethod"><option>نقدي</option><option>تحويل بنكي</option><option>كليك</option><option>أخرى</option></select>
-      <label>التاريخ</label><input id="pDate" type="date" required>
-      <label>ملاحظات</label><input id="pNotes">
-      <div class="dialog-actions"><button value="cancel" class="secondary">إلغاء</button><button id="savePayment" class="primary" value="default">حفظ</button></div>
-    </form>
-  </dialog>
-
-  <script src="app.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
