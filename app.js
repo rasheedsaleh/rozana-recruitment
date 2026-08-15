@@ -80,7 +80,7 @@ function showApp(u){
  currentUser=u;persistSession(u);$("loginView").classList.add("hidden");$("appView").classList.remove("hidden");applyPermissions(u);renderAll();
 }
 async function notifyTelegramLogin(u){
- try{await fetch(TELEGRAM_LOGIN_ENDPOINT,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({name:u.name,email:u.email,role:u.role,time:new Date().toISOString()}),keepalive:true)}catch(_){}
+ try{await fetch(TELEGRAM_LOGIN_ENDPOINT,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({name:u.name,email:u.email,role:u.role,time:new Date().toISOString()}),keepalive:true})}catch(_){}
 }
 $("loginBtn").onclick=()=>{const u=findUser($("email").value.trim(),$("password").value);if(u){$("loginError").textContent="";showApp(u);notifyTelegramLogin(u)}else $("loginError").textContent="البريد الإلكتروني أو كلمة المرور غير صحيحة."};
 $("logoutBtn").onclick=()=>{localStorage.removeItem(SESSION_KEY);currentUser=null;$("appView").classList.add("hidden");$("loginView").classList.remove("hidden");$("password").value=""};
