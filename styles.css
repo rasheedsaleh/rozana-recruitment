@@ -21,3 +21,11 @@ dialog{border:0;border-radius:23px;padding:0;width:min(980px,calc(100% - 30px));
 @media(max-width:760px){.topbar{height:auto;min-height:68px;padding:10px 12px}.brand strong{font-size:21px}.brand span{display:none}.top-actions{gap:4px}.container{margin-right:0;padding:14px}.tabs{position:sticky;top:0;bottom:auto;width:100%;height:auto;display:flex;flex-direction:row;padding:8px;margin:0 -14px 14px;width:calc(100% + 28px);overflow-x:auto;box-shadow:0 4px 18px #0002}.tabs:before{display:none}.tab{width:auto;min-width:max-content;padding:10px 12px}.tab:before{width:auto;margin-left:5px}.dashboard{grid-template-columns:1fr 1fr}.filters,.form-grid,.finance-entry,.payment-plan-grid,.payment-summary{grid-template-columns:1fr}.cost-grid{grid-template-columns:1fr}.summary-cards{grid-template-columns:1fr 1fr}.panel-head{align-items:flex-start;flex-direction:column}.installment-row,.payment-row{grid-template-columns:1fr 1fr}.report-grid{grid-template-columns:1fr 1fr}dialog form{padding:16px}}
 @media(max-width:460px){.dashboard{grid-template-columns:1fr}.summary-cards{grid-template-columns:1fr}.report-grid{grid-template-columns:1fr}.top-actions .ghost{font-size:12px;padding:7px}.panel-head .primary{width:100%}}
 @media print{.topbar,.tabs,.dashboard,.panel-head,.filters,.small-btn{display:none!important}.panel{display:block;border:0;box-shadow:none}.container{max-width:none;margin:0;padding:0}}
+
+.panel-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.import-btn{display:inline-flex;align-items:center;justify-content:center;background:var(--surface-2);color:var(--text);padding:11px 15px;border-radius:11px;font-weight:800;border:1px solid var(--border);cursor:pointer}
+.import-btn:hover{border-color:var(--primary-2);background:#23805f08}
+.import-status{margin:10px 0;padding:10px 13px;border-radius:11px;background:var(--surface);border:1px solid var(--border);color:var(--muted);font-size:13px;font-weight:700}
+@media(max-width:760px){.panel-actions{width:100%}.panel-actions .primary,.panel-actions .import-btn{flex:1}}
+
+#workers .table-wrap{max-width:100%;overflow-x:auto}#workers table{min-width:1450px}

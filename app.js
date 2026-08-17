@@ -22,7 +22,7 @@ function paymentStatus(w){const sale=num(w.sale),paid=workerPaid(w.id);if(sale<=
 function totals(){return db.workers.reduce((a,w)=>{a.sales+=num(w.sale);a.costs+=workerCost(w);a.profits+=num(w.sale)-workerCost(w);a.paid+=workerPaid(w.id);a.remaining+=workerRemaining(w);return a},{sales:0,costs:0,profits:0,paid:0,remaining:0})}
 function save(){localStorage.setItem(KEY,JSON.stringify(db));renderAll()}
 function renderAll(){const t=totals();$("workersCount").textContent=db.workers.length;$("activeCount").textContent=db.workers.filter(w=>w.status!=="غادرت").length;$("salesTotal").textContent=money(t.sales);$("costsTotal").textContent=money(t.costs);$("profitsTotal").textContent=money(t.profits);$("paymentsTotal").textContent=money(t.paid);$("remainingTotal").textContent=money(t.remaining);$("overdueTotal").textContent=db.workers.filter(w=>paymentStatus(w)==="غير مسدد"||paymentStatus(w)==="مدفوع جزئياً").length;$("paymentsPanelTotal").textContent=money(t.paid);$("remainingPanelTotal").textContent=money(t.remaining);$("paidWorkersCount").textContent=db.workers.filter(w=>paymentStatus(w)==="مسدد").length;$("unpaidWorkersCount").textContent=db.workers.filter(w=>paymentStatus(w)!=="مسدد").length;const et=db.expenses.reduce((a,e)=>a+num(e.amount),0);$("expensesPanelTotal").textContent=money(et);$("reportSales").textContent=money(t.sales);$("reportCosts").textContent=money(t.costs);$("reportProfits").textContent=money(t.profits);$("reportPayments").textContent=money(t.paid);$("reportRemaining").textContent=money(t.remaining);$("companyName").value=db.settings.companyName||"";$("companyPhone").value=db.settings.companyPhone||"";$("managerName").value=db.settings.managerName||"";$("managerEmail").value=db.settings.managerEmail||"";$("headerManagerName").textContent=db.settings.managerName||"المدير";$("brandName").textContent=(db.settings.companyName||"روزنا").split(" ")[0]||"روزنا";$("themeColor").value=db.settings.themeColor||"#1f7a5a";applyTheme();renderWorkers();renderGuarantors();renderPaymentSummary();renderExpenses();renderFollowups();renderUsers();fillWorkerSelects();updateTelegramStatus();}
-function renderWorkers(){const q=$("workerSearch").value.trim().toLowerCase(),st=$("workerStatus").value,n=$("workerNationality").value;const rows=db.workers.filter(w=>(!q||[w.name,w.passport,w.phone,w.guarantorName].join(" ").toLowerCase().includes(q))&&(!st||w.status===st)&&(!n||w.nationality===n));$("workersTable").innerHTML=rows.map(w=>`<tr><td>${esc(w.name||"بدون اسم")}</td><td>${esc(w.nationality||"—")}</td><td>${esc(w.passport||"—")}</td><td>${esc(w.guarantorName||"—")}</td><td>${money(w.sale)}</td><td>${money(workerCost(w))}</td><td class="profit-cell">${money(num(w.sale)-workerCost(w))}</td><td><span class="status-pill ${paymentStatus(w)==="مسدد"?"paid":"unpaid"}">${paymentStatus(w)}</span><small class="subtle">باقي ${money(workerRemaining(w))}</small></td><td><button class="small-btn" onclick="editWorker('${w.id}')">تعديل</button><button class="small-btn" onclick="openWorkerPayments('${w.id}')">الدفعات</button><button class="small-btn danger" onclick="deleteWorker('${w.id}')">حذف</button></td></tr>`).join("")||'<tr><td colspan="9">لا توجد بيانات</td></tr>'}
+function renderWorkers(){const q=$("workerSearch").value.trim().toLowerCase(),st=$("workerStatus").value,n=$("workerNationality").value;const rows=db.workers.filter(w=>(!q||[w.name,w.passport,w.phone,w.guarantorName,w.sourceData?.fileNo,w.sourceData?.sponsorPhone,w.sourceData?.nationalId].join(" ").toLowerCase().includes(q))&&(!st||w.status===st)&&(!n||w.nationality===n));$("workersTable").innerHTML=rows.map(w=>{const s=w.sourceData||{};return `<tr><td>${esc(s.fileNo||"—")}</td><td>${esc(w.name||"بدون اسم")}</td><td>${esc(w.nationality||"—")}</td><td>${esc(w.passport||"—")}</td><td>${esc(w.guarantorName||"—")}</td><td>${esc(s.sponsorPhone||"—")}</td><td>${esc(s.nationalId||"—")}</td><td>${esc(s.visaStatus||"—")}</td><td>${money(w.sale)}</td><td>${money(workerCost(w))}</td><td class="profit-cell">${money(num(w.sale)-workerCost(w))}</td><td><span class="status-pill ${paymentStatus(w)==="مسدد"?"paid":"unpaid"}">${paymentStatus(w)}</span><small class="subtle">باقي ${money(workerRemaining(w))}</small></td><td><button class="small-btn" onclick="editWorker('${w.id}')">تعديل</button><button class="small-btn" onclick="openWorkerPayments('${w.id}')">الدفعات</button><button class="small-btn danger" onclick="deleteWorker('${w.id}')">حذف</button></td></tr>`}).join("")||'<tr><td colspan="13">لا توجد بيانات</td></tr>'}
 function renderGuarantors(){const q=$("guarantorSearch").value.trim().toLowerCase(),n=$("guarantorNationalityFilter").value;const rows=db.guarantors.filter(g=>(!q||[g.name,g.phone].join(" ").toLowerCase().includes(q))&&(!n||g.nationality===n));$("guarantorsTable").innerHTML=rows.map(g=>`<tr><td>${esc(g.name||"بدون اسم")}</td><td>${esc(g.nationality||"—")}</td><td>${esc(g.phone||"—")}</td><td>${db.workers.filter(w=>w.guarantorName===g.name).length}</td><td><button class="small-btn" onclick="editGuarantor('${g.id}')">تعديل</button><button class="small-btn danger" onclick="deleteGuarantor('${g.id}')">حذف</button></td></tr>`).join("")||'<tr><td colspan="5">لا يوجد كفلاء</td></tr>'}
 function renderPaymentSummary(){const rows=db.workers;$("paymentSummaryTable").innerHTML=rows.map(w=>`<tr><td>${esc(w.name||"بدون اسم")}</td><td>${money(w.sale)}</td><td>${money(workerPaid(w.id))}</td><td>${money(workerRemaining(w))}</td><td><span class="status-pill ${paymentStatus(w)==="مسدد"?"paid":"unpaid"}">${paymentStatus(w)}</span></td><td>${db.payments.filter(p=>p.workerId===w.id).length}</td><td><button class="small-btn" onclick="openWorkerPayments('${w.id}')">إدارة الدفعات</button></td></tr>`).join("")||'<tr><td colspan="7">لا توجد عاملات</td></tr>'}
 function renderExpenses(){$("expensesTable").innerHTML=db.expenses.map(e=>`<tr><td>${esc(e.title||"—")}</td><td>${money(e.amount)}</td><td>${esc(e.date||"—")}</td><td>${esc(e.notes||"")}</td><td><button class="small-btn danger" onclick="deleteExpense('${e.id}')">حذف</button></td></tr>`).join("")||'<tr><td colspan="5">لا توجد مصاريف</td></tr>'}
@@ -67,9 +67,100 @@ $("saveSettings").onclick=()=>{db.settings.companyName=$("companyName").value;db
 function renderUsers(){$("usersTable").innerHTML=users().map(u=>`<tr><td>${esc(u.name)}</td><td>${esc(u.email)}</td><td>${u.role==="accounting"?"حسابات":u.role==="viewer"?"مشاهد":"موظف"}</td><td class="user-perm">${(u.permissions||[]).join("، ")}</td><td><button class="small-btn" onclick="editUser('${u.id}')">تعديل</button><button class="small-btn danger" onclick="deleteUser('${u.id}')">حذف</button></td></tr>`).join("")||'<tr><td colspan="5">لا يوجد موظفون</td></tr>'}window.editUser=id=>{const u=users().find(x=>x.id===id);if(!u)return;const n=prompt("اسم الموظف",u.name),e=prompt("البريد الإلكتروني",u.email);if(n===null||e===null)return;const r=prompt("الدور: employee / accounting / viewer",u.role)||u.role,p=prompt("الصلاحيات: workers,guarantors,payments,expenses,followup,reports,settings",(u.permissions||[]).join(","));if(!n.trim()||!e.trim())return;if(users().some(x=>x.id!==id&&x.email.toLowerCase()===e.trim().toLowerCase())||e.trim().toLowerCase()===db.settings.managerEmail.toLowerCase())return alert("البريد مستخدم مسبقًا");u.name=n.trim();u.email=e.trim();u.role=["employee","accounting","viewer"].includes(r)?r:"employee";u.permissions=(p||"").split(",").map(x=>x.trim()).filter(Boolean);const pw=prompt("كلمة مرور جديدة؟ اتركها فارغة للإبقاء على الحالية","");if(pw){if(pw.length<6)return alert("كلمة المرور يجب أن تكون 6 أحرف على الأقل");u.password=pw}save()};window.deleteUser=id=>{if(confirm("حذف الموظف؟")){db.settings.users=users().filter(x=>x.id!==id);save()}};
 $("changePassword").onclick=()=>{if(currentUser?.role!=="manager")return alert("تغيير كلمة المرور متاح للمدير فقط");if($("currentPassword").value!==db.settings.managerPassword)return alert("كلمة المرور الحالية غير صحيحة");if($("newPassword").value.length<6||$("newPassword").value!==$("confirmPassword").value)return alert("كلمة المرور الجديدة غير صحيحة");db.settings.managerPassword=$("newPassword").value;save();alert("تم تغيير كلمة المرور")};$("saveTheme").onclick=()=>{db.settings.themeColor=$("themeColor").value;save();alert("تم حفظ اللون")};$("testTelegram").onclick=async()=>{const ok=await telegramSend({event:"test",name:currentUser?.name||"",email:currentUser?.email||"",role:currentUser?.role||"",time:new Date().toISOString()});alert(ok?"تم إرسال رسالة الاختبار إلى Telegram":"فشل الإرسال. تأكد من TELEGRAM_BOT_TOKEN و TELEGRAM_CHAT_ID في Cloudflare")};
 $("exportData").onclick=()=>{const blob=new Blob([JSON.stringify(db,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="rozana-backup.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
+
+function normalizeImportedDate(v){
+  if(v instanceof Date && !isNaN(v)) return v.toISOString().slice(0,10);
+  if(typeof v==="number" && window.XLSX && XLSX.SSF){
+    const d=XLSX.SSF.parse_date_code(v); if(d) return `${d.y}-${String(d.m).padStart(2,"0")}-${String(d.d).padStart(2,"0")}`;
+  }
+  const s=String(v??"").trim();
+  if(!s) return "";
+  const m=s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+  return m?`${m[3]}-${String(m[2]).padStart(2,"0")}-${String(m[1]).padStart(2,"0")}`:s;
+}
+function cleanImportedText(v){return String(v??"").replace(/\s+/g," ").trim()}
+function visaToWorkerStatus(v){
+  const s=cleanImportedText(v);
+  if(/محجوز|reserved/i.test(s)) return "محجوزة";
+  if(/وصل|arriv/i.test(s)) return "وصلت";
+  return "متاحة";
+}
+function parseReservationSheet(rows){
+  const out=[];
+  for(let i=0;i<rows.length;i++){
+    const r=rows[i]||[];
+    const fileNo=cleanImportedText(r[4]);
+    const name=cleanImportedText(r[8]);
+    const sponsor=cleanImportedText(r[26]);
+    if(!name || (!fileNo && !sponsor)) continue;
+    const next=rows[i+1]||[];
+    const passport=cleanImportedText(next[9]);
+    const application=cleanImportedText(next[13]);
+    const applicationDate=normalizeImportedDate(next[14]);
+    const reservationDate=normalizeImportedDate(next[3]);
+    const visaStatus=cleanImportedText(next[17]);
+    const sponsorPhone=cleanImportedText(next[23]);
+    const nationalId=cleanImportedText(next[28]);
+    const arrive=cleanImportedText(r[20]||next[20]);
+    out.push({
+      fileNo,name,passport,application,applicationDate,reservationDate,visaStatus,
+      sponsor,sponsorPhone,nationalId,arrive
+    });
+  }
+  return out;
+}
+async function importReservationXlsx(file){
+  if(!window.XLSX) throw new Error("مكتبة Excel لم تُحمّل. تأكد من وجود الإنترنت ثم أعد المحاولة.");
+  const buf=await file.arrayBuffer();
+  const wb=XLSX.read(buf,{type:"array",cellDates:true});
+  const ws=wb.Sheets[wb.SheetNames[0]];
+  const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:"",raw:true});
+  const records=parseReservationSheet(rows);
+  if(!records.length) throw new Error("لم أجد سجلات عاملات في الكشف.");
+  let added=0,updated=0;
+  for(const r of records){
+    const key=(r.passport||"").toLowerCase();
+    let w=db.workers.find(x=>key && String(x.passport||"").toLowerCase()===key);
+    if(!w && r.fileNo) w=db.workers.find(x=>String(x.sourceData?.fileNo||"")===r.fileNo);
+    const sourceData={...(w?.sourceData||{}),...r};
+    const data={
+      name:r.name,
+      nationality:db.workers.find(x=>String(x.passport||"").toLowerCase()===key)?.nationality||"إثيوبيا",
+      passport:r.passport,
+      guarantorName:r.sponsor,
+      guarantorNationality:w?.guarantorNationality||"أردني",
+      phone:w?.phone||"",
+      status:visaToWorkerStatus(r.visaStatus),
+      dob:w?.dob||"",
+      notes:w?.notes||"",
+      sale:num(w?.sale),
+      costs:w?.costs||{},
+      paymentPlan:w?.paymentPlan||"full",
+      installments:w?.installments||[],
+      created:w?.created||today(),
+      sourceData
+    };
+    if(w){Object.assign(w,data);updated++}
+    else{db.workers.push({id:uid(),...data});added++}
+    // Create a guarantor record only when the sponsor does not already exist.
+    if(r.sponsor && !db.guarantors.some(g=>cleanImportedText(g.name).toLowerCase()===r.sponsor.toLowerCase())){
+      db.guarantors.push({id:uid(),name:r.sponsor,nationality:"أردني",phone:r.sponsorPhone,notes:"مستورد من كشف الحجوزات"})
+    }
+  }
+  save();
+  return {total:records.length,added,updated};
+}
+$("importXlsx").onchange=async e=>{
+  const f=e.target.files?.[0]; if(!f)return;
+  try{
+    const result=await importReservationXlsx(f);
+    alert(`تم استيراد كشف الحجوزات بنجاح.\nعدد السجلات: ${result.total}\nتمت إضافة: ${result.added}\nتم تحديث: ${result.updated}`);
+  }catch(err){console.error(err);alert("تعذر استيراد ملف Excel: "+(err.message||"خطأ غير معروف"))}
+  e.target.value="";
+};
 $("importData").onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const x=JSON.parse(r.result);db={...initial,...x,settings:{...initial.settings,...(x.settings||{})}};for(const k of ["workers","guarantors","payments","expenses","followups"])if(!Array.isArray(db[k]))db[k]=[];
 db.payments.forEach(p=>{if(!p.status)p.status="paid";if(!p.source)p.source="legacy"});delete db.contracts;save();alert("تم الاستيراد") }catch{alert("الملف غير صالح")}};r.readAsText(f)};
-function report(type){const t=totals();let html="",company=esc(db.settings.companyName);if(type==="workers"||type==="all")html+=`<h2>العاملات</h2><table><tr><th>الاسم</th><th>الجنسية</th><th>الجواز</th><th>البيع</th><th>التكلفة</th><th>الربح</th><th>التسديد</th><th>المتبقي</th></tr>${db.workers.map(w=>`<tr><td>${esc(w.name)}</td><td>${esc(w.nationality)}</td><td>${esc(w.passport)}</td><td>${money(w.sale)}</td><td>${money(workerCost(w))}</td><td>${money(num(w.sale)-workerCost(w))}</td><td>${paymentStatus(w)}</td><td>${money(workerRemaining(w))}</td></tr>`).join("")}</table>`;if(type==="finance"||type==="all")html+=`<h2>الملخص المالي</h2><p>إجمالي البيع: ${money(t.sales)} | التكلفة: ${money(t.costs)} | الربح: ${money(t.profits)} | المدفوع: ${money(t.paid)} | المتبقي: ${money(t.remaining)}</p>`;if(type==="payments"||type==="all")html+=`<h2>التسديد</h2><table><tr><th>العاملة</th><th>المبلغ</th><th>الحالة</th><th>التاريخ</th><th>الطريقة</th></tr>${db.payments.map(p=>`<tr><td>${esc(workerName(p.workerId))}</td><td>${money(p.amount)}</td><td>${p.status==="paid"?"مسددة":"غير مسددة"}</td><td>${esc(p.date)}</td><td>${esc(p.method)}</td></tr>`).join("")}</table>`;const w=window.open("","_blank");if(!w)return alert("المتصفح منع فتح صفحة التقرير");w.document.write(`<html dir="rtl"><head><meta charset="utf-8"><title>تقرير روزنا</title><style>body{font-family:Arial;padding:30px}table{width:100%;border-collapse:collapse;margin:12px 0 25px}th,td{border:1px solid #bbb;padding:8px;text-align:right}th{background:#eee}.print{padding:10px 16px}@media print{.print{display:none}}</style></head><body><button class="print" onclick="print()">طباعة / حفظ PDF</button><h1>${company}</h1><div>تاريخ التقرير: ${today()}</div>${html}</body></html>`);w.document.close()}
+function report(type){const t=totals();let html="",company=esc(db.settings.companyName);if(type==="workers"||type==="all")html+=`<h2>العاملات</h2><table><tr><th>الملف</th><th>الاسم</th><th>الجنسية</th><th>الجواز</th><th>البيع</th><th>التكلفة</th><th>الربح</th><th>التسديد</th><th>المتبقي</th></tr>${db.workers.map(w=>`<tr><td>${esc(w.sourceData?.fileNo||"—")}</td><td>${esc(w.name)}</td><td>${esc(w.nationality)}</td><td>${esc(w.passport)}</td><td>${money(w.sale)}</td><td>${money(workerCost(w))}</td><td>${money(num(w.sale)-workerCost(w))}</td><td>${paymentStatus(w)}</td><td>${money(workerRemaining(w))}</td></tr>`).join("")}</table>`;if(type==="finance"||type==="all")html+=`<h2>الملخص المالي</h2><p>إجمالي البيع: ${money(t.sales)} | التكلفة: ${money(t.costs)} | الربح: ${money(t.profits)} | المدفوع: ${money(t.paid)} | المتبقي: ${money(t.remaining)}</p>`;if(type==="payments"||type==="all")html+=`<h2>التسديد</h2><table><tr><th>العاملة</th><th>المبلغ</th><th>الحالة</th><th>التاريخ</th><th>الطريقة</th></tr>${db.payments.map(p=>`<tr><td>${esc(workerName(p.workerId))}</td><td>${money(p.amount)}</td><td>${p.status==="paid"?"مسددة":"غير مسددة"}</td><td>${esc(p.date)}</td><td>${esc(p.method)}</td></tr>`).join("")}</table>`;const w=window.open("","_blank");if(!w)return alert("المتصفح منع فتح صفحة التقرير");w.document.write(`<html dir="rtl"><head><meta charset="utf-8"><title>تقرير روزنا</title><style>body{font-family:Arial;padding:30px}table{width:100%;border-collapse:collapse;margin:12px 0 25px}th,td{border:1px solid #bbb;padding:8px;text-align:right}th{background:#eee}.print{padding:10px 16px}@media print{.print{display:none}}</style></head><body><button class="print" onclick="print()">طباعة / حفظ PDF</button><h1>${company}</h1><div>تاريخ التقرير: ${today()}</div>${html}</body></html>`);w.document.close()}
 document.querySelectorAll(".report-card").forEach(b=>b.onclick=()=>report(b.dataset.report));
 buildCostFields();applyTheme();
 const session=localStorage.getItem(SESSION_KEY);if(session)try{const s=JSON.parse(session),u=s.role==="manager"?{email:db.settings.managerEmail,name:db.settings.managerName,role:"manager",permissions:["workers","guarantors","payments","expenses","followup","reports","settings"]}:users().find(x=>x.email===s.email);if(u)showApp(u);else localStorage.removeItem(SESSION_KEY)}catch{localStorage.removeItem(SESSION_KEY)}
