@@ -1,0 +1,4 @@
+CREATE TABLE IF NOT EXISTS app_state (
+  id INTEGER PRIMARY KEY,
+  state TEXT NOT NULL
+);
